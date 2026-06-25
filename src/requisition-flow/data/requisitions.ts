@@ -112,7 +112,8 @@ export function makeBlankRequisition(): Requisition {
     id: nextRequisitionId(), title: "", department: "", location: "", employmentType: "Full-time",
     level: "", requisitionType: "New headcount", status: "Draft", description: "",
     idealCandidate: { summary: "", mustHaveSkills: [], niceToHaveSkills: [], experience: "" },
-    salaryBand: "", budget: "", targetHeadcount: 1, approvalChain: [],
+    salaryBand: "", budget: "", targetHeadcount: 1,
+    approvalChain: [{ id: "ap1", approver: "Rachel Patel", role: "VP Operations", state: "Pending" }],
     hiringTeam: [
       { id: "tm1", name: "", role: "Hiring Manager" },
       { id: "tm2", name: "", role: "Recruiter" },

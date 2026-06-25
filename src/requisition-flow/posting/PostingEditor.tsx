@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Megaphone, Globe, Check, Send, ArrowLeft, Lock, Users, FileText, FileSignature, RotateCcw } from "lucide-react";
+import { Megaphone, Globe, Check, Send, ArrowLeft, Lock, Users, FileText, FileSignature, RotateCcw, Building2 } from "lucide-react";
 import type { Requisition, Posting, PostingVariant, PostingStatus, PostingAudience, PostingContentOverride } from "../types";
-import { channelsForAudience, POSTING_LANGUAGES, APPLICATION_FORMS } from "../data/constants";
+import { channelsForAudience, POSTING_LANGUAGES, APPLICATION_FORMS, CAREER_SITES } from "../data/constants";
 import { nextPostingId } from "../data/postings";
 import { poppins, Button, StatusPill, SectionCard, Checkbox, Field, TextAreaField, SelectField } from "../components/primitives";
 
@@ -31,8 +31,11 @@ export function PostingEditor({ req, audience, existing, audienceContent, onAudi
     new Set(existing ? existing.variants.map((v) => v.language) : [req.content.primaryLanguage || "English"]),
   );
   const [formId, setFormId] = useState<string>(existing?.applicationFormId ?? APPLICATION_FORMS[0]);
+  const [careerSites, setCareerSites] = useState<Set<string>>(() => new Set(existing?.careerSites ?? [CAREER_SITES[0]]));
 
   const channelLabels = audienceChannels.filter((c) => channels.has(c.label)).map((c) => c.label);
+  const careerSiteSelected = audience !== "Internal" && channels.has("Career site");
+  const careerSiteList = CAREER_SITES.filter((s) => careerSites.has(s));
   const languageList = POSTING_LANGUAGES.filter((l) => languages.has(l));
   const variantCount = channelLabels.length * languageList.length;
 
@@ -53,6 +56,9 @@ export function PostingEditor({ req, audience, existing, audienceContent, onAudi
   function toggleLanguage(label: string) {
     setLanguages((prev) => { const n = new Set(prev); n.has(label) ? n.delete(label) : n.add(label); return n; });
   }
+  function toggleCareerSite(label: string) {
+    setCareerSites((prev) => { const n = new Set(prev); n.has(label) ? n.delete(label) : n.add(label); return n; });
+  }
 
   function build(status: PostingStatus): Posting {
     const variants: PostingVariant[] = [];
@@ -63,7 +69,7 @@ export function PostingEditor({ req, audience, existing, audienceContent, onAudi
         variants.push({ id: `v${i}`, channel, language, status });
       }
     }
-    return { id: existing?.id ?? nextPostingId(), requisitionId: req.id, title: req.title, audience, status, variants, applicationFormId: formId };
+    return { id: existing?.id ?? nextPostingId(), requisitionId: req.id, title: req.title, audience, status, variants, applicationFormId: formId, careerSites: careerSiteSelected && careerSiteList.length ? careerSiteList : undefined };
   }
 
   return (
@@ -108,6 +114,26 @@ export function PostingEditor({ req, audience, existing, audienceContent, onAudi
             })}
           </div>
         </SectionCard>
+
+        {careerSiteSelected && (
+          <SectionCard title="Career sites" description="Publish to one or more brand career sites." icon={<Building2 className="size-[16px]" />}>
+            <div className="grid grid-cols-2 gap-[10px]">
+              {CAREER_SITES.map((site) => {
+                const on = careerSites.has(site);
+                return (
+                  <button key={site} onClick={() => toggleCareerSite(site)} className="flex items-center gap-[12px] p-[12px] rounded-[10px] border text-left transition-colors" style={{ backgroundColor: on ? "#eae8fb" : "#fff", borderColor: on ? "#cac1f2" : "#d1d5dc" }}>
+                    <Checkbox checked={on} onChange={() => toggleCareerSite(site)} />
+                    <div className="flex items-center gap-[8px] min-w-0">
+                      <div className="flex items-center justify-center size-[28px] rounded-[8px] bg-white text-[#2927b2] shrink-0" style={{ border: "1px solid #e3e1f7" }}><Building2 className="size-[14px]" /></div>
+                      <span className="text-[13px] font-medium truncate" style={{ ...poppins, color: on ? "#2927b2" : "#353b46" }}>{site}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {careerSiteList.length === 0 && <span className="block mt-[10px] text-[12px] text-[#c62828]" style={poppins}>Select at least one career site to publish to.</span>}
+          </SectionCard>
+        )}
 
         <SectionCard title="Languages" description="Each language produces a localized variant." icon={<Globe className="size-[16px]" />}>
           <div className="flex flex-wrap gap-[8px]">

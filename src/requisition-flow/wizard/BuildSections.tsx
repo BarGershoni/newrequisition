@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Plus, Minus, Trash2, Link2, LayoutList, Users, DollarSign, Briefcase, CheckCircle2, AlertTriangle, Target, X, GitBranch, CalendarDays, Mail, Send, ChevronDown, ChevronRight, Search, Lock, Sparkles, RefreshCw, UserPlus, Check, Pencil } from "lucide-react";
+import { Plus, Minus, Trash2, Link2, LayoutList, Users, DollarSign, Briefcase, CheckCircle2, AlertTriangle, Target, X, GitBranch, CalendarDays, Mail, Send, ChevronDown, ChevronRight, Search, Lock, Sparkles, RefreshCw, UserPlus, Check } from "lucide-react";
 import type { Requisition, Opening, HiringTeamMember, ApprovalStep, IdealCandidate, MatchProfile } from "../types";
 import { hiringManagerOf } from "../types";
 import { PhenomDropdown } from "@/app/components/phenom";
@@ -477,20 +477,20 @@ export function OpeningsSection({ openings, allOpenings, onAddNew, onLinkExistin
       description="Each requisition needs at least one seat. Add new seats or link existing unlinked ones."
       icon={<LayoutList className="size-[16px]" />}
       action={
-        <div className="flex items-center gap-[8px]">
-          {openings.length > 0 && (
-            <Button variant={manageMode ? "subtle" : "ghost"} onClick={toggleManage}>
-              {manageMode ? <><Check className="size-[15px]" /> Done</> : <><Pencil className="size-[15px]" /> Manage openings</>}
-            </Button>
-          )}
-          <AddOpeningControl linkOptions={linkOptions} onAddNew={onAddNew} onLinkExisting={onLinkExisting} />
-        </div>
+        openings.length > 0 ? (
+          <Button variant="ghost" onClick={toggleManage}>
+            {manageMode ? "Done" : "Manage openings"}
+          </Button>
+        ) : undefined
       }
     >
       {openings.length === 0 ? (
-        <div className="flex items-center gap-[10px] justify-center py-[24px] text-[#c62828]">
-          <AlertTriangle className="size-[16px]" />
-          <span className="text-[13px]" style={poppins}>At least one opening is required.</span>
+        <div className="flex flex-col items-center gap-[14px] py-[24px]">
+          <div className="flex items-center gap-[10px] text-[#c62828]">
+            <AlertTriangle className="size-[16px]" />
+            <span className="text-[13px]" style={poppins}>At least one opening is required.</span>
+          </div>
+          <AddOpeningControl linkOptions={linkOptions} onAddNew={onAddNew} onLinkExisting={onLinkExisting} />
         </div>
       ) : (
         <div className="flex flex-col gap-[10px]">
@@ -548,6 +548,9 @@ export function OpeningsSection({ openings, allOpenings, onAddNew, onLinkExistin
               </div>
             );
           })}
+          <div className="pt-[2px]">
+            <AddOpeningControl linkOptions={linkOptions} onAddNew={onAddNew} onLinkExisting={onLinkExisting} />
+          </div>
         </div>
       )}
     </SectionCard>

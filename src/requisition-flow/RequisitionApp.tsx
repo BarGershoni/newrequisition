@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import type { Requisition, Opening, Posting } from "./types";
 import { linkedOpenings } from "./types";
 import { SAMPLE_REQUISITIONS } from "./data/requisitions";
@@ -7,6 +7,7 @@ import { SAMPLE_OPENINGS } from "./data/openings";
 import { SAMPLE_POSTINGS } from "./data/postings";
 import { AppShell } from "./components/AppShell";
 import { RequisitionsList } from "./pages/RequisitionsList";
+import { JobPage } from "./pages/JobPage";
 import { RequisitionConfigPage } from "./pages/RequisitionConfigPage";
 import { CreateRequisitionModal } from "./wizard/CreateRequisitionModal";
 import { ApprovalStep } from "./wizard/ApprovalStep";
@@ -27,6 +28,8 @@ export default function RequisitionApp() {
   const [config, setConfig] = useState<ConfigState | null>(null);
   const [approvalReq, setApprovalReq] = useState<Requisition | null>(null);
   const [postingReqId, setPostingReqId] = useState<string | null>(null);
+  const [jobPageId, setJobPageId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   function upsertRequisition(req: Requisition) {
     setRequisitions((prev) => (prev.some((r) => r.id === req.id) ? prev.map((r) => (r.id === req.id ? req : r)) : [req, ...prev]));
@@ -53,6 +56,17 @@ export default function RequisitionApp() {
     upsertRequisition(req);
     mergeOpenings(seats);
     setConfig(null);
+  }
+
+  function completeSetup(req: Requisition, seats: Opening[]) {
+    upsertRequisition(req);
+    mergeOpenings(seats);
+    setConfig(null);
+    setCreating(true);
+    window.setTimeout(() => {
+      setCreating(false);
+      setJobPageId(req.id);
+    }, 1500);
   }
 
   function submitForApproval(req: Requisition, seats: Opening[]) {
@@ -88,15 +102,12 @@ export default function RequisitionApp() {
     );
   }
 
-  function editRequisition(req: Requisition) {
-    if (req.status === "Draft" || req.status === "Pending Approval") {
-      setConfig({ req, openings: linkedOpenings(req, openings) });
-    } else {
-      setPostingReqId(req.id);
-    }
+  function openJobSettings(req: Requisition) {
+    setConfig({ req, openings: linkedOpenings(req, openings) });
   }
 
   const postingReq = postingReqId ? requisitions.find((r) => r.id === postingReqId) ?? null : null;
+  const jobPageReq = jobPageId ? requisitions.find((r) => r.id === jobPageId) ?? null : null;
 
   return (
     <AppShell>
@@ -107,11 +118,22 @@ export default function RequisitionApp() {
           allOpenings={openings}
           initialSection={config.initialSection ?? 0}
           postings={postings}
+          backLabel={jobPageId ? "Back to job" : "Back to all jobs"}
           onSaveDraft={saveDraft}
           onSubmit={submitForApproval}
           onCancel={() => setConfig(null)}
+          onComplete={completeSetup}
           onSavePosting={savePosting}
           onDeletePosting={deletePosting}
+        />
+      ) : jobPageReq ? (
+        <JobPage
+          req={jobPageReq}
+          openings={openings}
+          postings={postings}
+          onBack={() => setJobPageId(null)}
+          onJobSettings={openJobSettings}
+          onManagePosting={(req) => setPostingReqId(req.id)}
         />
       ) : (
         <RequisitionsList
@@ -119,7 +141,7 @@ export default function RequisitionApp() {
           openings={openings}
           postings={postings}
           onCreate={() => setModalOpen(true)}
-          onEdit={editRequisition}
+          onEdit={(req) => setJobPageId(req.id)}
           onManagePosting={(req) => setPostingReqId(req.id)}
         />
       )}
@@ -160,6 +182,16 @@ export default function RequisitionApp() {
         onDelete={deletePosting}
         onAudienceContentChange={(audience, field, value) => postingReq && updateAudienceContent(postingReq.id, audience, field, value)}
       />
+
+      {/* Creating job loader */}
+      {creating && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-[16px]">
+            <Loader2 className="size-[40px] text-[#4d3ee0] animate-spin" />
+            <span className="text-[15px] font-medium text-[#353b46]" style={{ fontFamily: "Poppins, sans-serif" }}>Creating your job…</span>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

@@ -20,15 +20,17 @@ const SECTIONS = [
 let tmCounter = 200;
 let apCounter = 200;
 
-export function RequisitionConfigPage({ initialReq, initialOpenings, allOpenings, initialSection = 0, postings, onSaveDraft, onSubmit, onCancel, onSavePosting, onDeletePosting }: {
+export function RequisitionConfigPage({ initialReq, initialOpenings, allOpenings, initialSection = 0, postings, backLabel = "Back", onSaveDraft, onSubmit, onCancel, onComplete, onSavePosting, onDeletePosting }: {
   initialReq: Requisition;
   initialOpenings: Opening[];
   allOpenings: Opening[];
   initialSection?: number;
   postings: Posting[];
+  backLabel?: string;
   onSaveDraft: (req: Requisition, openings: Opening[]) => void;
   onSubmit: (req: Requisition, openings: Opening[]) => void;
   onCancel: () => void;
+  onComplete: (req: Requisition, openings: Opening[]) => void;
   onSavePosting: (posting: Posting) => void;
   onDeletePosting: (postingId: string) => void;
 }) {
@@ -126,8 +128,8 @@ export function RequisitionConfigPage({ initialReq, initialOpenings, allOpenings
     <div className="flex flex-1 flex-col h-full min-w-0 overflow-hidden">
       {/* Page header */}
       <div className="bg-white shrink-0 px-[24px] py-[14px] flex items-center gap-[16px]" style={{ borderBottom: "1px solid #d1d5dc" }}>
-        <button onClick={onCancel} className="flex items-center gap-[8px] px-[12px] py-[8px] rounded-[10px] text-[14px] font-medium text-[#464f5e] hover:bg-[#f3f3f5] transition-colors" style={poppins}>
-          <ArrowLeft className="size-[15px]" /> Requisitions
+        <button onClick={onCancel} title={backLabel} aria-label={backLabel} className="flex items-center justify-center size-[36px] rounded-[10px] text-[#464f5e] hover:bg-[#f3f3f5] transition-colors shrink-0">
+          <ArrowLeft className="size-[18px]" />
         </button>
         <div className="flex flex-col flex-1 min-w-0">
           <span className="text-[18px] font-semibold text-[#353b46] truncate" style={poppins}>{draft.title || "Untitled requisition"}</span>
@@ -211,8 +213,8 @@ export function RequisitionConfigPage({ initialReq, initialOpenings, allOpenings
               <ArrowLeft className="size-[15px]" /> Back
             </button>
             {isLast ? (
-              <button onClick={() => onSaveDraft(finalReq(draft.status), finalOpenings())} className="flex items-center gap-[8px] px-[18px] py-[9px] rounded-[10px] text-[14px] font-medium text-white bg-[#4d3ee0] hover:bg-[#4434c4] transition-colors" style={poppins}>
-                <Send className="size-[15px]" /> Publish
+              <button onClick={() => onComplete(finalReq(draft.status), finalOpenings())} className="flex items-center gap-[8px] px-[18px] py-[9px] rounded-[10px] text-[14px] font-medium text-white bg-[#4d3ee0] hover:bg-[#4434c4] transition-colors" style={poppins}>
+                <Check className="size-[15px]" /> Complete Setup
               </button>
             ) : (
               <button onClick={() => goTo(Math.min(SECTIONS.length - 1, section + 1))} className="flex items-center gap-[8px] px-[18px] py-[9px] rounded-[10px] text-[14px] font-medium text-white bg-[#4d3ee0] hover:bg-[#4434c4] transition-colors" style={poppins}>

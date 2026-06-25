@@ -214,6 +214,8 @@ export interface Posting {
   variants: PostingVariant[];
   /** the application form candidates fill out for this posting (per posting) */
   applicationFormId?: string;
+  /** brand career sites to publish to (external "Career site" channel; a company may run several brands) */
+  careerSites?: string[];
 }
 
 // ─── Derived helpers ────────────────────────────────────────────────────────────

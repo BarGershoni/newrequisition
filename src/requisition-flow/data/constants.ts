@@ -10,6 +10,8 @@ export const HIRING_TEAM_ROLES = ["Hiring Manager", "Recruiter", "Recruiting Coo
 export const OPENING_STATUSES = ["Open", "Filled", "On Hold", "Cancelled"];
 export const OPENING_REASONS = ["New headcount", "Backfill", "Replacement", "Conversion", "Reorganization"];
 export const APPLICATION_FORMS = ["Standard application", "Quick apply (resume only)", "Detailed application", "Internal mobility form", "Executive application"];
+// Brand career sites — a company may run several, one per brand.
+export const CAREER_SITES = ["Acme Careers", "Globex Talent", "Initech Jobs", "Umbrella Careers"];
 export const YEARS_OF_EXPERIENCE = ["No minimum", "1+ years", "2+ years", "3+ years", "5+ years", "8+ years", "10+ years"];
 export const LOCATION_RADII = ["Exact location only", "Within 10 miles", "Within 25 miles", "Within 50 miles", "Within 100 miles", "Anywhere / Remote"];
 export const EDUCATION_LEVELS = ["No requirement", "High school", "Associate degree", "Bachelor's degree", "Master's degree", "Doctorate"];
